@@ -14,20 +14,20 @@ export default class Enemy {
     // Set properties based on enemy type
     switch (type) {
       case 'tank':
-        this.health = 200;
-        this.maxHealth = 200;
+        this.health = 20;
+        this.maxHealth = 20;
         this.damage = 15;
         this.unitCount = 50;
         break;
       case 'boss':
-        this.health = 500;
-        this.maxHealth = 500;
+        this.health = 50;
+        this.maxHealth = 50;
         this.damage = 30;
         this.unitCount = 100;
         break;
       default: // basic
-        this.health = 100;
-        this.maxHealth = 100;
+        this.health = 10;
+        this.maxHealth = 10;
         this.damage = 10;
         this.unitCount = 20;
     }

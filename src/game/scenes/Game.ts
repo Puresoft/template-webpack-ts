@@ -120,8 +120,8 @@ export class Game extends Scene
                 const enemy = this.enemies[j];
                 
                 if (this.checkCollision(bullet.sprite, enemy.sprite)) {
-                    // Enemy nimmt Schaden
-                    const defeated = enemy.takeDamage(bullet.getDamage());
+                    // Enemy nimmt 1 Schadenspunkt pro Treffer
+                    const defeated = enemy.takeDamage(1);
                     
                     // Entferne Bullet
                     bullet.destroy();
@@ -278,8 +278,9 @@ export class Game extends Scene
         ];
         
         // Random upgrades spawnen über die Zeit
-        for (let i = 0; i < 3; i++) {
-            this.time.delayedCall(i * 2000, () => {
+        const upgradeCount = Math.random() < 0.5 ? 1 : 2; // 50% Chance für 1 oder 2 Upgrades
+        for (let i = 0; i < upgradeCount; i++) {
+            this.time.delayedCall(i * 4000, () => { // Verlängert auf 4 Sekunden zwischen Upgrades
                 const randomUpgrade = Phaser.Math.RND.pick(upgradeTypes);
                 const x = 200 + Math.random() * 600; // Zufällige X-Position
                 const y = -50; // Starten oben außerhalb des Bildschirms
