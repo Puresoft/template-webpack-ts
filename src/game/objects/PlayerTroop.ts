@@ -113,30 +113,88 @@ export default class PlayerTroop {
   private updateFormation() {
     this.formationCenterX = this.sprite.x;
     
-    // Berechne Formation-Layout (horizontale Linie)
-    for (let i = 0; i < this.playerUnits.length; i++) {
-      const unit = this.playerUnits[i];
-      
-      if (i === 0) {
-        // Haupt-Player bleibt in der Mitte
-        continue;
+    // Pyramiden-Formation mit maximal 3 Reihen
+    const spacing = 60 * 0.7; // 30% Überlagerung = 70% des normalen Abstands
+    const rowSpacing = 50; // Abstand zwischen Reihen
+    
+    // Spieler 0 ist immer der Hauptplayer (vorne, alleine)
+    this.playerUnits[0].sprite.x = this.formationCenterX;
+    this.playerUnits[0].sprite.y = this.formationCenterY;
+    
+    if (this.playerUnits.length === 1) return;
+    
+    // Berechne Reihenverteilung
+    const remainingPlayers = this.playerUnits.length - 1; // Ohne Hauptplayer
+    let row2Count, row3Count;
+    
+    if (remainingPlayers <= 4) {
+      // 2-5 Spieler: Alle anderen in Reihe 2
+      row2Count = remainingPlayers;
+      row3Count = 0;
+    } else {
+      // 6-10 Spieler: Verteile auf Reihe 2 und 3
+      if (remainingPlayers === 5) { // 6 Spieler total
+        row2Count = 2;
+        row3Count = 3;
+      } else if (remainingPlayers === 6) { // 7 Spieler total
+        row2Count = 3;
+        row3Count = 3;
+      } else if (remainingPlayers === 7) { // 8 Spieler total
+        row2Count = 3;
+        row3Count = 4;
+      } else if (remainingPlayers === 8) { // 9 Spieler total
+        row2Count = 4;
+        row3Count = 4;
+      } else { // 10 Spieler total
+        row2Count = 4;
+        row3Count = 5;
       }
+    }
+    
+    // Positioniere Reihe 2
+    if (row2Count > 0) {
+      const row2Y = this.formationCenterY + rowSpacing;
+      const row2Width = (row2Count - 1) * spacing;
+      const row2StartX = this.formationCenterX - row2Width / 2;
       
-      // Berechne Position für zusätzliche Einheiten
-      const spacing = 60; // Abstand zwischen Einheiten
-      const totalWidth = (this.playerUnits.length - 1) * spacing;
-      const startX = this.formationCenterX - totalWidth / 2;
+      for (let i = 0; i < row2Count; i++) {
+        const playerIndex = 1 + i;
+        if (playerIndex < this.playerUnits.length) {
+          const targetX = row2StartX + i * spacing;
+          const targetY = row2Y;
+          
+          const unit = this.playerUnits[playerIndex];
+          const currentX = unit.sprite.x;
+          const currentY = unit.sprite.y;
+          const lerp = 0.1;
+          
+          unit.sprite.x = currentX + (targetX - currentX) * lerp;
+          unit.sprite.y = currentY + (targetY - currentY) * lerp;
+        }
+      }
+    }
+    
+    // Positioniere Reihe 3
+    if (row3Count > 0) {
+      const row3Y = this.formationCenterY + rowSpacing * 2;
+      const row3Width = (row3Count - 1) * spacing;
+      const row3StartX = this.formationCenterX - row3Width / 2;
       
-      const targetX = startX + (i - 1) * spacing + (i > this.playerUnits.length / 2 ? spacing : 0);
-      const targetY = this.formationCenterY;
-      
-      // Smooth movement towards target position
-      const currentX = unit.sprite.x;
-      const currentY = unit.sprite.y;
-      const lerp = 0.1;
-      
-      unit.sprite.x = currentX + (targetX - currentX) * lerp;
-      unit.sprite.y = currentY + (targetY - currentY) * lerp;
+      for (let i = 0; i < row3Count; i++) {
+        const playerIndex = 1 + row2Count + i;
+        if (playerIndex < this.playerUnits.length) {
+          const targetX = row3StartX + i * spacing;
+          const targetY = row3Y;
+          
+          const unit = this.playerUnits[playerIndex];
+          const currentX = unit.sprite.x;
+          const currentY = unit.sprite.y;
+          const lerp = 0.1;
+          
+          unit.sprite.x = currentX + (targetX - currentX) * lerp;
+          unit.sprite.y = currentY + (targetY - currentY) * lerp;
+        }
+      }
     }
   }
 
