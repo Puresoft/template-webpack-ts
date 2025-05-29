@@ -1,0 +1,159 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+## 🗺️ **4. `Game.ts`: Hauptszene**
+
+```ts
+// src/game/scenes/Game.ts
+import Phaser from 'phaser';
+import PlayerTroop from '../objects/PlayerTroop';
+import Enemy from '../objects/Enemy';
+import Upgrade from '../objects/Upgrade';
+
+export default class GameScene extends Phaser.Scene {
+  private player!: PlayerTroop;
+  private enemies!: Phaser.GameObjects.Group;
+  private upgrades!: Phaser.GameObjects.Group;
+
+  constructor() {
+    super('GameScene');
+  }
+
+  preload() {
+    this.load.image('player', 'assets/sprites/player.png');
+    this.load.image('enemy', 'assets/sprites/enemy.png');
+    this.load.image('upgrade', 'assets/sprites/upgrade.png');
+  }
+
+  create() {
+    this.player = new PlayerTroop(this, 100, 500);
+    this.enemies = this.add.group();
+    this.upgrades = this.add.group();
+
+    this.spawnEnemy(700, 500);
+    this.spawnUpgrade(400, 500);
+  }
+
+  update(time: number, delta: number): void {
+    this.player.update();
+
+    this.physics.overlap(this.player.sprite, this.enemies, () => {
+      console.log('Kampf!');
+    });
+
+    this.physics.overlap(this.player.sprite, this.upgrades, (player, upgrade: any) => {
+      console.log('Upgrade aktiviert!');
+      upgrade.destroy();
+      this.player.addUnits(5); // Beispiel
+    });
+  }
+
+  spawnEnemy(x: number, y: number) {
+    const enemy = new Enemy(this, x, y);
+    this.enemies.add(enemy.sprite);
+  }
+
+  spawnUpgrade(x: number, y: number) {
+    const upgrade = new Upgrade(this, x, y);
+    this.upgrades.add(upgrade.sprite);
+  }
+}
+```
+
+---
+
+## 🧍 **5. `PlayerTroop.ts`: Spielertrupp**
+
+```ts
+// src/objects/PlayerTroop.ts
+import Phaser from 'phaser';
+
+export default class PlayerTroop {
+  public sprite: Phaser.Physics.Arcade.Sprite;
+  private scene: Phaser.Scene;
+  private unitCount: number = 10;
+
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    this.scene = scene;
+    this.sprite = scene.physics.add.sprite(x, y, 'player');
+    this.sprite.setVelocityX(50); // Automatische Bewegung nach rechts
+  }
+
+  update() {
+    // z. B. Healthbar, Animation
+  }
+
+  addUnits(amount: number) {
+    this.unitCount += amount;
+    console.log(`Neue Einheitengröße: ${this.unitCount}`);
+  }
+}
+```
+
+---
+
+## 👾 **6. `Enemy.ts`: Gegnerklasse**
+
+```ts
+// src/objects/Enemy.ts
+import Phaser from 'phaser';
+
+export default class Enemy {
+  public sprite: Phaser.Physics.Arcade.Sprite;
+
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    this.sprite = scene.physics.add.sprite(x, y, 'enemy');
+    this.sprite.setImmovable(true);
+  }
+}
+```
+
+---
+
+## 🎁 **7. `Upgrade.ts`: Upgrade-Objekte**
+
+```ts
+// src/objects/Upgrade.ts
+import Phaser from 'phaser';
+
+export default class Upgrade {
+  public sprite: Phaser.Physics.Arcade.Sprite;
+
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    this.sprite = scene.physics.add.sprite(x, y, 'upgrade');
+    this.sprite.setImmovable(true);
+  }
+}
+```
+
+---
+
+## 🧪 **8. Testen**
+
+1. Starte dein Projekt:
+
+   ```bash
+   npm run dev
+   ```
+2. Überprüfe die Konsole:
+
+   * Upgrade einsammeln sollte die Einheitengröße erhöhen.
+   * Gegnerkontakt sollte eine Kampf-Logik triggern.
+
+---
+
+## ✅ **Nächste Schritte (ToDo-Liste für Junior Devs)**
+
+* [ ] Eine Healthbar für Gegner und Truppen erstellen
+* [ ] Kampflogik einbauen (Schaden, Lebenspunkte)
+* [ ] Mehrere Einheiten im Spielertrupp anzeigen
+* [ ] Upgrade-Pfade links/rechts mit Entscheidungsmöglichkeit
+* [ ] Animationen & Sounds hinzufügen
+
+---
+
+Möchtest du im nächsten Schritt eine einfache Kampflogik einbauen (z. B. Damage pro Sekunde) oder zuerst die Darstellung mehrerer Soldaten in einer Formation?
+
